@@ -28,12 +28,12 @@ jobs:
       - name: Generate Firebase config from secrets
         run: |
           printf 'const firebaseConfig = {\n' > js/firebase-config.js
-          printf '    apiKey: "%s",\n' "${{ secrets.FIREBASE_API_KEY }}" >> js/firebase-config.js
-          printf '    authDomain: "%s",\n' "${{ secrets.FIREBASE_AUTH_DOMAIN }}" >> js/firebase-config.js
-          printf '    projectId: "%s",\n' "${{ secrets.FIREBASE_PROJECT_ID }}" >> js/firebase-config.js
-          printf '    storageBucket: "%s",\n' "${{ secrets.FIREBASE_STORAGE_BUCKET }}" >> js/firebase-config.js
-          printf '    messagingSenderId: "%s",\n' "${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}" >> js/firebase-config.js
-          printf '    appId: "%s"\n' "${{ secrets.FIREBASE_APP_ID }}" >> js/firebase-config.js
+          printf '    apiKey: "%s",\n' "${{ secrets.YOUR_API_KEY }}" >> js/firebase-config.js
+          printf '    authDomain: "%s.firebaseapp.com",\n' "${{ secrets.YOUR_PROJECT_ID }}" >> js/firebase-config.js
+          printf '    projectId: "%s",\n' "${{ secrets.YOUR_PROJECT_ID }}" >> js/firebase-config.js
+          printf '    storageBucket: "%s.firebasestorage.app",\n' "${{ secrets.YOUR_PROJECT_ID }}" >> js/firebase-config.js
+          printf '    messagingSenderId: "%s",\n' "${{ secrets.YOUR_SENDER_ID }}" >> js/firebase-config.js
+          printf '    appId: "%s"\n' "${{ secrets.YOUR_APP_ID }}" >> js/firebase-config.js
           printf '};\n' >> js/firebase-config.js
           printf 'firebase.initializeApp(firebaseConfig);\n' >> js/firebase-config.js
           printf 'const db = firebase.firestore();\n' >> js/firebase-config.js

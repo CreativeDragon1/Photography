@@ -1,6 +1,9 @@
 // firebase-config.example.js
 // Copy this to firebase-config.js and fill in your values for local dev.
 // firebase-config.js is gitignored — for deployment, secrets are injected by GitHub Actions.
+//
+// GitHub Actions secret names used:
+//   YOUR_API_KEY, YOUR_PROJECT_ID, YOUR_SENDER_ID, YOUR_APP_ID
 
 const firebaseConfig = {
     apiKey: "YOUR_API_KEY",
