@@ -3,7 +3,7 @@
    ============================================ */
 
 // =============================================
-// Gallery Data (local, no database needed)
+// Fallback Gallery Data (shown if Firestore unreachable)
 // =============================================
 const galleryData = [
     { id: 1, src: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80', title: 'Misty Valleys', category: 'nature', caption: 'Western Ghats, India' },
@@ -27,6 +27,316 @@ const galleryData = [
     { id: 19, src: 'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=800&q=80', title: 'Wings in Flight', category: 'nature', caption: 'Bharatpur, India' },
     { id: 20, src: 'https://images.unsplash.com/photo-1514539079130-25950c84af65?w=800&q=80', title: 'Narrow Lanes', category: 'street', caption: 'Jaipur, India' },
 ];
+
+// Instagram placeholder data
+const instagramData = [
+    'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&q=80',
+    'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=400&q=80',
+    'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=400&q=80',
+    'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400&q=80',
+    'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=400&q=80',
+    'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=400&q=80',
+];
+
+// =============================================
+// Loader
+// =============================================
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        document.getElementById('loader').classList.add('hidden');
+    }, 1500);
+});
+
+// =============================================
+// Navigation
+// =============================================
+const navbar = document.getElementById('navbar');
+const navToggle = document.getElementById('navToggle');
+const navLinks = document.getElementById('navLinks');
+
+window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 80);
+}, { passive: true });
+
+navToggle.addEventListener('click', () => {
+    navToggle.classList.toggle('active');
+    navLinks.classList.toggle('open');
+});
+
+navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+        navToggle.classList.remove('active');
+        navLinks.classList.remove('open');
+    });
+});
+
+const sections = document.querySelectorAll('section[id]');
+window.addEventListener('scroll', () => {
+    const scrollPos = window.scrollY + 200;
+    sections.forEach(section => {
+        const top = section.offsetTop;
+        const height = section.offsetHeight;
+        const id = section.getAttribute('id');
+        const link = navLinks.querySelector(`a[href="#${id}"]`);
+        if (link) {
+            link.classList.toggle('active', scrollPos >= top && scrollPos < top + height);
+        }
+    });
+}, { passive: true });
+
+// =============================================
+// Parallax Effects
+// =============================================
+function initParallax() {
+    const heroParallax = document.querySelector('.hero-parallax-bg');
+    const parallaxBgs = document.querySelectorAll('.parallax-bg');
+
+    window.addEventListener('scroll', () => {
+        const scrollY = window.scrollY;
+        if (heroParallax) {
+            heroParallax.style.transform = `translateY(${scrollY * 0.4}px)`;
+        }
+        parallaxBgs.forEach(bg => {
+            const section = bg.parentElement;
+            const rect = section.getBoundingClientRect();
+            if (rect.top < window.innerHeight && rect.bottom > 0) {
+                bg.style.transform = `translateY(${rect.top * 0.3}px)`;
+            }
+        });
+    }, { passive: true });
+}
+
+// =============================================
+// Scroll Reveal
+// =============================================
+function initReveal() {
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+    reveals.forEach(el => observer.observe(el));
+}
+
+// =============================================
+// Masonry Gallery — loads from Firestore
+// =============================================
+let currentGalleryItems = [];
+
+async function initGallery() {
+    const grid = document.getElementById('masonryGrid');
+    if (!grid) return;
+
+    // Show skeleton while loading
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:#555;font-size:0.85rem;letter-spacing:0.1em;text-transform:uppercase;">Loading gallery…</div>';
+
+    try {
+        // Try Firestore first
+        const firestoreItems = await dbGetPhotos();
+        currentGalleryItems = firestoreItems.length > 0 ? firestoreItems : galleryData;
+    } catch (err) {
+        // Firestore not configured or offline — use hardcoded fallback
+        console.warn('Firestore unavailable, using local fallback:', err.message);
+        currentGalleryItems = galleryData;
+    }
+
+    renderGallery(currentGalleryItems);
+}
+
+function renderGallery(items) {
+    const grid = document.getElementById('masonryGrid');
+    if (!grid) return;
+
+    grid.innerHTML = items.map((item, i) => `
+        <div class="masonry-item" data-category="${item.category}" data-index="${i}" style="animation-delay:${i * 0.04}s">
+            <img src="${item.src}" alt="${item.title}" loading="lazy">
+            <div class="masonry-overlay">
+                <div class="masonry-overlay-text">
+                    <h4>${item.title}</h4>
+                    <span>${item.caption}</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    grid.querySelectorAll('.masonry-item').forEach(item => {
+        item.addEventListener('click', () => openLightbox(parseInt(item.dataset.index)));
+    });
+
+    initFilters(items);
+}
+
+function initFilters(items) {
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const masonryItems = document.querySelectorAll('.masonry-item');
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const filter = btn.dataset.filter;
+
+            masonryItems.forEach((item, i) => {
+                const show = filter === 'all' || item.dataset.category === filter;
+                item.classList.toggle('hidden', !show);
+                if (show) {
+                    item.style.animation = 'none';
+                    void item.offsetHeight;
+                    item.style.animation = '';
+                    item.style.animationDelay = `${i * 0.03}s`;
+                }
+            });
+        });
+    });
+}
+
+// =============================================
+// Lightbox
+// =============================================
+let currentLightboxIndex = 0;
+let lightboxItems = [];
+
+function openLightbox(index) {
+    const visibleItems = [...document.querySelectorAll('.masonry-item:not(.hidden)')];
+    lightboxItems = visibleItems.map(el => currentGalleryItems[parseInt(el.dataset.index)]);
+
+    const clickedItem = currentGalleryItems[index];
+    currentLightboxIndex = lightboxItems.findIndex(it =>
+        (it.firestoreId && it.firestoreId === clickedItem.firestoreId) || it.src === clickedItem.src
+    );
+    if (currentLightboxIndex === -1) currentLightboxIndex = 0;
+
+    updateLightbox();
+    document.getElementById('lightbox').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function updateLightbox() {
+    const item = lightboxItems[currentLightboxIndex];
+    if (!item) return;
+    const img = document.getElementById('lightboxImg');
+    img.style.opacity = '0';
+    setTimeout(() => {
+        img.src = item.src.includes('unsplash.com') ? item.src.replace(/w=\d+/, 'w=1400') : item.src;
+        img.onload = () => { img.style.opacity = '1'; };
+    }, 150);
+    document.getElementById('lightboxTitle').textContent = item.title;
+    document.getElementById('lightboxCaption').textContent = item.caption;
+    document.getElementById('lightboxCounter').textContent = `${currentLightboxIndex + 1} / ${lightboxItems.length}`;
+}
+
+function lightboxPrev() {
+    currentLightboxIndex = (currentLightboxIndex - 1 + lightboxItems.length) % lightboxItems.length;
+    updateLightbox();
+}
+
+function lightboxNext() {
+    currentLightboxIndex = (currentLightboxIndex + 1) % lightboxItems.length;
+    updateLightbox();
+}
+
+document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+document.getElementById('lightboxPrev').addEventListener('click', lightboxPrev);
+document.getElementById('lightboxNext').addEventListener('click', lightboxNext);
+document.getElementById('lightbox').addEventListener('click', e => {
+    if (e.target === document.getElementById('lightbox')) closeLightbox();
+});
+document.addEventListener('keydown', e => {
+    if (!document.getElementById('lightbox').classList.contains('active')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') lightboxPrev();
+    if (e.key === 'ArrowRight') lightboxNext();
+});
+let touchStartX = 0;
+document.getElementById('lightbox').addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+document.getElementById('lightbox').addEventListener('touchend', e => {
+    const diff = e.changedTouches[0].screenX - touchStartX;
+    if (Math.abs(diff) > 50) diff > 0 ? lightboxPrev() : lightboxNext();
+}, { passive: true });
+
+// =============================================
+// Instagram Grid
+// =============================================
+function initInstagram() {
+    const grid = document.getElementById('instaGrid');
+    if (!grid) return;
+    grid.innerHTML = instagramData.map(src => `
+        <div class="instagram-item"><img src="${src}" alt="Instagram" loading="lazy"></div>
+    `).join('');
+}
+
+// =============================================
+// About Counter Animation
+// =============================================
+function initCounters() {
+    const counters = document.querySelectorAll('.stat-number');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateCounter(entry.target, parseInt(entry.target.dataset.count));
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+    counters.forEach(c => observer.observe(c));
+}
+
+function animateCounter(el, target) {
+    let current = 0;
+    const step = target / 60;
+    const timer = setInterval(() => {
+        current += step;
+        if (current >= target) { current = target; clearInterval(timer); }
+        el.textContent = Math.floor(current);
+    }, 25);
+}
+
+// =============================================
+// Contact Form
+// =============================================
+document.getElementById('contactForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target));
+    const messages = JSON.parse(localStorage.getItem('ak_messages') || '[]');
+    messages.push({ ...data, date: new Date().toISOString() });
+    localStorage.setItem('ak_messages', JSON.stringify(messages));
+    alert('Thank you for your message! I\'ll get back to you soon.');
+    e.target.reset();
+});
+
+// =============================================
+// Smooth scroll
+// =============================================
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', e => {
+        const target = document.querySelector(anchor.getAttribute('href'));
+        if (target) {
+            e.preventDefault();
+            window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
+        }
+    });
+});
+
+// =============================================
+// Initialize
+// =============================================
+document.addEventListener('DOMContentLoaded', () => {
+    initParallax();
+    initReveal();
+    initGallery();
+    initInstagram();
+    initCounters();
+});
+
 
 // Instagram placeholder data
 const instagramData = [
