@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin – Aditya Koushik Photography</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* --- Admin Variables --- */
+        :root {
+            --admin-bg: #0d0d0d;
+            --admin-surface: #161616;
+            --admin-surface-2: #1c1c1c;
+            --admin-border: #2a2a2a;
+            --admin-text: #e8e8e8;
+            --admin-text-muted: #777;
+            --admin-accent: #c9a96e;
+            --admin-accent-hover: #dbb97e;
+            --admin-danger: #e74c3c;
+            --admin-success: #27ae60;
+            --admin-radius: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--admin-bg);
+            color: var(--admin-text);
+            min-height: 100vh;
+        }
+
+        /* --- Layout --- */
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            background: var(--admin-surface);
+            border-right: 1px solid var(--admin-border);
+            padding: 2rem 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 2rem;
+            border-bottom: 1px solid var(--admin-border);
+        }
+
+        .sidebar-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--admin-accent);
+        }
+
+        .sidebar-logo span {
+            display: block;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: var(--admin-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-top: 0.2rem;
+        }
+
+        .sidebar-nav {
+            padding: 1.5rem 0;
+            flex: 1;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1.5rem;
+            color: var(--admin-text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            color: var(--admin-text);
+            background: rgba(201, 169, 110, 0.05);
+            border-left-color: var(--admin-accent);
+        }
+
+        .sidebar-nav a i {
+            width: 20px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--admin-border);
+        }
+
+        .sidebar-footer a {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--admin-text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+
+        .sidebar-footer a:hover {
+            color: var(--admin-accent);
+        }
+
+        /* --- Main Content --- */
+        .main-content {
+            padding: 2rem 3rem;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--admin-border);
+        }
+
+        .page-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        /* --- Stats Cards --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--admin-surface);
+            border: 1px solid var(--admin-border);
+            border-radius: var(--admin-radius);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(201, 169, 110, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--admin-accent);
+            font-size: 1.1rem;
+        }
+
+        .stat-info h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--admin-text);
+        }
+
+        .stat-info p {
+            font-size: 0.75rem;
+            color: var(--admin-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* --- Buttons --- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.5rem;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            border: none;
+            border-radius: var(--admin-radius);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--admin-accent);
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background: var(--admin-accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--admin-danger);
+            border: 1px solid rgba(231, 76, 60, 0.2);
+        }
+
+        .btn-danger:hover {
+            background: var(--admin-danger);
+            color: #fff;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--admin-text-muted);
+            border: 1px solid var(--admin-border);
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--admin-accent);
+            color: var(--admin-accent);
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.78rem;
+        }
+
+        /* --- Sections --- */
+        .panel {
+            background: var(--admin-surface);
+            border: 1px solid var(--admin-border);
+            border-radius: var(--admin-radius);
+            margin-bottom: 2rem;
+        }
+
+        .panel-header {
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--admin-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .panel-body {
+            padding: 1.5rem;
+        }
+
+        /* --- Add Image Form --- */
+        .add-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .add-form .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--admin-text-muted);
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            background: var(--admin-bg);
+            border: 1px solid var(--admin-border);
+            border-radius: 6px;
+            color: var(--admin-text);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--admin-accent);
+        }
+
+        .form-group select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23777' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* --- Image Upload Area --- */
+        .upload-area {
+            border: 2px dashed var(--admin-border);
+            border-radius: var(--admin-radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--admin-bg);
+        }
+
+        .upload-area:hover,
+        .upload-area.dragover {
+            border-color: var(--admin-accent);
+            background: rgba(201, 169, 110, 0.03);
+        }
+
+        .upload-area i {
+            font-size: 2rem;
+            color: var(--admin-accent);
+            margin-bottom: 0.8rem;
+        }
+
+        .upload-area p {
+            font-size: 0.85rem;
+            color: var(--admin-text-muted);
+        }
+
+        .upload-area small {
+            font-size: 0.75rem;
+            color: #555;
+            margin-top: 0.3rem;
+            display: block;
+        }
+
+        .preview-thumb {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        /* --- Gallery Admin Grid --- */
+        .admin-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .admin-gallery-item {
+            position: relative;
+            border-radius: var(--admin-radius);
+            overflow: hidden;
+            border: 1px solid var(--admin-border);
+            background: var(--admin-bg);
+            transition: border-color 0.2s;
+        }
+
+        .admin-gallery-item:hover {
+            border-color: var(--admin-accent);
+        }
+
+        .admin-gallery-item img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .admin-gallery-item .item-info {
+            padding: 0.8rem;
+        }
+
+        .admin-gallery-item .item-info h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .admin-gallery-item .item-info span {
+            font-size: 0.7rem;
+            color: var(--admin-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .admin-gallery-item .item-actions {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0 0.8rem 0.8rem;
+        }
+
+        .admin-gallery-item .badge {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(0,0,0,0.7);
+            color: var(--admin-accent);
+            font-size: 0.65rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .admin-gallery-item .badge.default {
+            color: var(--admin-text-muted);
+        }
+
+        /* --- Messages Table --- */
+        .messages-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .messages-table th,
+        .messages-table td {
+            padding: 0.8rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--admin-border);
+            font-size: 0.85rem;
+        }
+
+        .messages-table th {
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--admin-text-muted);
+            background: var(--admin-bg);
+        }
+
+        .messages-table td {
+            color: var(--admin-text-muted);
+        }
+
+        .messages-table tr:hover td {
+            color: var(--admin-text);
+        }
+
+        /* --- Tabs (for panels) --- */
+        .tab-section {
+            display: none;
+        }
+
+        .tab-section.active-tab {
+            display: block;
+        }
+
+        /* --- Toast Notification --- */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: var(--admin-radius);
+            color: #fff;
+            font-size: 0.85rem;
+            font-weight: 500;
+            z-index: 9999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: var(--admin-success);
+        }
+
+        .toast.error {
+            background: var(--admin-danger);
+        }
+
+        /* --- Empty State --- */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--admin-text-muted);
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .empty-state p {
+            font-size: 0.9rem;
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 992px) {
+            .admin-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: relative;
+                height: auto;
+                flex-direction: row;
+                align-items: center;
+                padding: 1rem;
+                overflow-x: auto;
+            }
+
+            .sidebar-header {
+                padding: 0 1rem 0 0;
+                border-bottom: none;
+                border-right: 1px solid var(--admin-border);
+            }
+
+            .sidebar-nav {
+                display: flex;
+                padding: 0;
+            }
+
+            .sidebar-nav a {
+                padding: 0.5rem 1rem;
+                border-left: none;
+                border-bottom: 2px solid transparent;
+                white-space: nowrap;
+                font-size: 0.8rem;
+            }
+
+            .sidebar-nav a:hover,
+            .sidebar-nav a.active {
+                border-bottom-color: var(--admin-accent);
+                border-left-color: transparent;
+                background: transparent;
+            }
+
+            .sidebar-footer {
+                display: none;
+            }
+
+            .main-content {
+                padding: 1.5rem;
+            }
+
+            .add-form {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .admin-gallery {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    AK
+                    <span>Admin Panel</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="active" data-tab="dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
+                <a href="#" data-tab="add-photo"><i class="fas fa-plus-circle"></i> Add Photo</a>
+                <a href="#" data-tab="manage"><i class="fas fa-images"></i> Manage Gallery</a>
+                <a href="#" data-tab="messages"><i class="fas fa-envelope"></i> Messages</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="index.html"><i class="fas fa-external-link-alt"></i> View Website</a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Dashboard Tab -->
+            <div class="tab-section active-tab" id="tab-dashboard">
+                <div class="page-header">
+                    <h1>Dashboard</h1>
+                    <a href="index.html" class="btn btn-ghost" target="_blank"><i class="fas fa-external-link-alt"></i> View Site</a>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-images"></i></div>
+                        <div class="stat-info">
+                            <h3 id="statTotal">0</h3>
+                            <p>Total Photos</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-plus"></i></div>
+                        <div class="stat-info">
+                            <h3 id="statCustom">0</h3>
+                            <p>Custom Added</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-filter"></i></div>
+                        <div class="stat-info">
+                            <h3 id="statCategories">0</h3>
+                            <p>Categories</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-envelope"></i></div>
+                        <div class="stat-info">
+                            <h3 id="statMessages">0</h3>
+                            <p>Messages</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Recent Custom Photos</h2>
+                    </div>
+                    <div class="panel-body">
+                        <div class="admin-gallery" id="recentGallery"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Photo Tab -->
+            <div class="tab-section" id="tab-add-photo">
+                <div class="page-header">
+                    <h1>Add New Photo</h1>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2>Photo Details</h2>
+                    </div>
+                    <div class="panel-body">
+                        <form class="add-form" id="addPhotoForm">
+                            <div class="form-group full-width">
+                                <label>Image</label>
+                                <div class="upload-area" id="uploadArea">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Drag & drop an image or click to browse</p>
+                                    <small>Supports: JPG, PNG, WebP — or paste an image URL below</small>
+                                    <input type="file" id="fileInput" accept="image/*" style="display:none">
+                                    <img class="preview-thumb" id="previewThumb" alt="Preview">
+                                </div>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>Or Image URL</label>
+                                <input type="url" id="imageUrl" placeholder="https://images.unsplash.com/photo-..." oninput="previewUrl(this.value)">
+                            </div>
+                            <div class="form-group">
+                                <label>Title</label>
+                                <input type="text" id="photoTitle" placeholder="e.g. Mountain Sunrise" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select id="photoCategory">
+                                    <option value="nature">Nature</option>
+                                    <option value="travel">Travel</option>
+                                    <option value="street">Street</option>
+                                    <option value="landscape">Landscape</option>
+                                    <option value="architecture">Architecture</option>
+                                </select>
+                            </div>
+                            <div class="form-group full-width">
+                                <label>Caption / Location</label>
+                                <input type="text" id="photoCaption" placeholder="e.g. Himalayas, India">
+                            </div>
+                            <div class="full-width" style="display:flex; gap:0.8rem; margin-top:0.5rem;">
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Add to Gallery</button>
+                                <button type="reset" class="btn btn-ghost">Clear</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manage Gallery Tab -->
+            <div class="tab-section" id="tab-manage">
+                <div class="page-header">
+                    <h1>Manage Gallery</h1>
+                    <div style="display:flex; gap:0.5rem;">
+                        <select id="manageFilter" class="btn btn-ghost" style="padding:0.5rem 1rem; font-size:0.8rem; background:var(--admin-surface); color:var(--admin-text); border:1px solid var(--admin-border); border-radius:6px;">
+                            <option value="all">All Categories</option>
+                            <option value="nature">Nature</option>
+                            <option value="travel">Travel</option>
+                            <option value="street">Street</option>
+                            <option value="landscape">Landscape</option>
+                            <option value="architecture">Architecture</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-body">
+                        <div class="admin-gallery" id="manageGallery"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages Tab -->
+            <div class="tab-section" id="tab-messages">
+                <div class="page-header">
+                    <h1>Messages</h1>
+                    <button class="btn btn-danger btn-sm" id="clearMessages"><i class="fas fa-trash"></i> Clear All</button>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-body" id="messagesBody">
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // =============================================
+        // Admin Panel JavaScript
+        // =============================================
+
+        // --- Storage Helpers ---
+        function getCustomPhotos() {
+            try { return JSON.parse(localStorage.getItem('ak_gallery') || '[]'); } 
+            catch { return []; }
+        }
+
+        function saveCustomPhotos(photos) {
+            localStorage.setItem('ak_gallery', JSON.stringify(photos));
+        }
+
+        function getMessages() {
+            try { return JSON.parse(localStorage.getItem('ak_messages') || '[]'); }
+            catch { return []; }
+        }
+
+        // Default gallery (same as main site)
+        const defaultGallery = [
+            { id: 1, src: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80', title: 'Misty Valleys', category: 'nature', caption: 'Western Ghats, India' },
+            { id: 2, src: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80', title: 'Alpine Peaks', category: 'landscape', caption: 'Himalayas' },
+            { id: 3, src: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80', title: 'Urban Geometry', category: 'architecture', caption: 'Mumbai, India' },
+            { id: 4, src: 'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=800&q=80', title: 'Golden Reflections', category: 'landscape', caption: 'Kashmir, India' },
+            { id: 5, src: 'https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=800&q=80', title: 'Coastal Serenity', category: 'travel', caption: 'Goa, India' },
+            { id: 6, src: 'https://images.unsplash.com/photo-1517760444937-f6397edcbbcd?w=800&q=80', title: 'Street Tales', category: 'street', caption: 'Varanasi, India' },
+            { id: 7, src: 'https://images.unsplash.com/photo-1518173946687-a1e0e2a9e57c?w=800&q=80', title: 'Monsoon Fields', category: 'nature', caption: 'Meghalaya, India' },
+            { id: 8, src: 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=800&q=80', title: 'Fog & Light', category: 'landscape', caption: 'Darjeeling, India' },
+            { id: 9, src: 'https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=800&q=80', title: 'Waterfall Symphony', category: 'nature', caption: 'Coorg, India' },
+            { id: 10, src: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&q=80', title: 'Sun Rays', category: 'landscape', caption: 'Munnar, India' },
+            { id: 11, src: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&q=80', title: 'City Nights', category: 'street', caption: 'Delhi, India' },
+            { id: 12, src: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=800&q=80', title: 'Modern Lines', category: 'architecture', caption: 'Bangalore, India' },
+            { id: 13, src: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80', title: 'Lake Serenity', category: 'travel', caption: 'Udaipur, India' },
+            { id: 14, src: 'https://images.unsplash.com/photo-1465056836900-8f1e940b3583?w=800&q=80', title: 'Desert Dunes', category: 'travel', caption: 'Rajasthan, India' },
+            { id: 15, src: 'https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=800&q=80', title: 'Ancient Canopy', category: 'nature', caption: 'Sundarbans, India' },
+            { id: 16, src: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=800&q=80', title: 'Skyline Glow', category: 'architecture', caption: 'Hyderabad, India' },
+            { id: 17, src: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80', title: 'Starlit Peaks', category: 'landscape', caption: 'Ladakh, India' },
+            { id: 18, src: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800&q=80', title: 'Emerald Waters', category: 'travel', caption: 'Andaman Islands' },
+            { id: 19, src: 'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=800&q=80', title: 'Wings in Flight', category: 'nature', caption: 'Bharatpur, India' },
+            { id: 20, src: 'https://images.unsplash.com/photo-1514539079130-25950c84af65?w=800&q=80', title: 'Narrow Lanes', category: 'street', caption: 'Jaipur, India' },
+        ];
+
+        // --- Toast ---
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // --- Tab Navigation ---
+        document.querySelectorAll('.sidebar-nav a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tabId = link.dataset.tab;
+
+                document.querySelectorAll('.sidebar-nav a').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+
+                document.querySelectorAll('.tab-section').forEach(t => t.classList.remove('active-tab'));
+                document.getElementById(`tab-${tabId}`).classList.add('active-tab');
+
+                refreshAll();
+            });
+        });
+
+        // --- Dashboard Stats ---
+        function refreshStats() {
+            const custom = getCustomPhotos();
+            const messages = getMessages();
+            const allPhotos = [...defaultGallery, ...custom];
+            const categories = new Set(allPhotos.map(p => p.category));
+
+            document.getElementById('statTotal').textContent = allPhotos.length;
+            document.getElementById('statCustom').textContent = custom.length;
+            document.getElementById('statCategories').textContent = categories.size;
+            document.getElementById('statMessages').textContent = messages.length;
+        }
+
+        // --- Recent Photos on Dashboard ---
+        function refreshRecent() {
+            const custom = getCustomPhotos();
+            const container = document.getElementById('recentGallery');
+
+            if (custom.length === 0) {
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-images"></i><p>No custom photos added yet. Use "Add Photo" to get started.</p></div>`;
+                return;
+            }
+
+            const recent = custom.slice(-6).reverse();
+            container.innerHTML = recent.map(p => `
+                <div class="admin-gallery-item">
+                    <span class="badge">Custom</span>
+                    <img src="${p.src}" alt="${p.title}" loading="lazy">
+                    <div class="item-info">
+                        <h4>${p.title}</h4>
+                        <span>${p.category} · ${p.caption}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- Manage Gallery ---
+        function refreshManageGallery() {
+            const custom = getCustomPhotos();
+            const filter = document.getElementById('manageFilter').value;
+            const allPhotos = [...defaultGallery.map(p => ({...p, isDefault: true})), ...custom.map(p => ({...p, isDefault: false}))];
+            const filtered = filter === 'all' ? allPhotos : allPhotos.filter(p => p.category === filter);
+
+            const container = document.getElementById('manageGallery');
+            container.innerHTML = filtered.map(p => `
+                <div class="admin-gallery-item">
+                    <span class="badge ${p.isDefault ? 'default' : ''}">${p.isDefault ? 'Default' : 'Custom'}</span>
+                    <img src="${p.src}" alt="${p.title}" loading="lazy">
+                    <div class="item-info">
+                        <h4>${p.title}</h4>
+                        <span>${p.category} · ${p.caption}</span>
+                    </div>
+                    ${!p.isDefault ? `
+                    <div class="item-actions">
+                        <button class="btn btn-danger btn-sm" onclick="deletePhoto(${p.id})"><i class="fas fa-trash"></i> Delete</button>
+                    </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('manageFilter').addEventListener('change', refreshManageGallery);
+
+        // --- Delete Photo ---
+        function deletePhoto(id) {
+            if (!confirm('Delete this photo from the gallery?')) return;
+            let custom = getCustomPhotos();
+            custom = custom.filter(p => p.id !== id);
+            saveCustomPhotos(custom);
+            showToast('Photo deleted');
+            refreshAll();
+        }
+
+        // --- Add Photo ---
+        let pendingImageData = null;
+
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const previewThumb = document.getElementById('previewThumb');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                processFile(file);
+            }
+        });
+
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files[0]) processFile(fileInput.files[0]);
+        });
+
+        function processFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                pendingImageData = e.target.result;
+                previewThumb.src = pendingImageData;
+                previewThumb.style.display = 'block';
+                document.getElementById('imageUrl').value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function previewUrl(url) {
+            if (url) {
+                previewThumb.src = url;
+                previewThumb.style.display = 'block';
+                pendingImageData = null;
+            } else {
+                previewThumb.style.display = 'none';
+            }
+        }
+
+        document.getElementById('addPhotoForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const imageUrl = document.getElementById('imageUrl').value.trim();
+            const title = document.getElementById('photoTitle').value.trim();
+            const category = document.getElementById('photoCategory').value;
+            const caption = document.getElementById('photoCaption').value.trim();
+
+            const src = pendingImageData || imageUrl;
+            if (!src) {
+                showToast('Please add an image', 'error');
+                return;
+            }
+            if (!title) {
+                showToast('Please enter a title', 'error');
+                return;
+            }
+
+            const custom = getCustomPhotos();
+            const maxId = Math.max(100, ...custom.map(p => p.id), ...defaultGallery.map(p => p.id));
+
+            const newPhoto = {
+                id: maxId + 1,
+                src,
+                title,
+                category,
+                caption: caption || 'No location specified'
+            };
+
+            custom.push(newPhoto);
+            saveCustomPhotos(custom);
+
+            showToast(`"${title}" added to gallery!`);
+
+            // Reset
+            e.target.reset();
+            previewThumb.style.display = 'none';
+            pendingImageData = null;
+
+            refreshAll();
+        });
+
+        document.getElementById('addPhotoForm').addEventListener('reset', () => {
+            previewThumb.style.display = 'none';
+            pendingImageData = null;
+        });
+
+        // --- Messages ---
+        function refreshMessages() {
+            const messages = getMessages();
+            const container = document.getElementById('messagesBody');
+
+            if (messages.length === 0) {
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-envelope-open"></i><p>No messages yet.</p></div>`;
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="messages-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Subject</th>
+                            <th>Message</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${messages.reverse().map(m => `
+                            <tr>
+                                <td style="color:var(--admin-text); font-weight:500;">${m.name || '—'}</td>
+                                <td>${m.email || '—'}</td>
+                                <td>${m.subject || '—'}</td>
+                                <td style="max-width:250px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${m.message || '—'}</td>
+                                <td style="white-space:nowrap;">${m.date ? new Date(m.date).toLocaleDateString() : '—'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        document.getElementById('clearMessages').addEventListener('click', () => {
+            if (!confirm('Delete all messages?')) return;
+            localStorage.removeItem('ak_messages');
+            showToast('All messages cleared');
+            refreshAll();
+        });
+
+        // --- Refresh All ---
+        function refreshAll() {
+            refreshStats();
+            refreshRecent();
+            refreshManageGallery();
+            refreshMessages();
+        }
+
+        // --- Init ---
+        refreshAll();
+    </script>
+</body>
+</html>
