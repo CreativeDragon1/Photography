@@ -410,6 +410,16 @@ function initLazyLoad() {
 }
 
 // =============================================
+// Listen for storage changes from admin panel
+// (auto-refreshes gallery when photos added in another tab)
+// =============================================
+window.addEventListener('storage', (e) => {
+    if (e.key === 'ak_gallery') {
+        initGallery();
+    }
+});
+
+// =============================================
 // Initialize
 // =============================================
 document.addEventListener('DOMContentLoaded', () => {

@@ -675,14 +675,14 @@
                                 <div class="upload-area" id="uploadArea">
                                     <i class="fas fa-cloud-upload-alt"></i>
                                     <p>Drag & drop an image or click to browse</p>
-                                    <small>Supports: JPG, PNG, WebP — or paste an image URL below</small>
+                                    <small>Auto-compressed on upload. For best results, paste an image URL below instead.</small>
                                     <input type="file" id="fileInput" accept="image/*" style="display:none">
                                     <img class="preview-thumb" id="previewThumb" alt="Preview">
                                 </div>
                             </div>
                             <div class="form-group full-width">
-                                <label>Or Image URL</label>
-                                <input type="url" id="imageUrl" placeholder="https://images.unsplash.com/photo-..." oninput="previewUrl(this.value)">
+                                <label>Or Image URL (paste any image link)</label>
+                                <input type="text" id="imageUrl" placeholder="https://images.unsplash.com/photo-...?w=800" oninput="previewUrl(this.value)" autocomplete="off">
                             </div>
                             <div class="form-group">
                                 <label>Title</label>
@@ -765,7 +765,15 @@
         }
 
         function saveCustomPhotos(photos) {
-            localStorage.setItem('ak_gallery', JSON.stringify(photos));
+            try {
+                localStorage.setItem('ak_gallery', JSON.stringify(photos));
+            } catch (e) {
+                if (e.name === 'QuotaExceededError' || e.code === 22) {
+                    showToast('Storage full! Use image URLs instead of file uploads.', 'error');
+                    throw e;
+                }
+                throw e;
+            }
         }
 
         function getMessages() {
@@ -926,12 +934,28 @@
         });
 
         function processFile(file) {
+            // Compress image before storing to avoid localStorage quota issues
+            const maxW = 1200;
+            const quality = 0.82;
             const reader = new FileReader();
-            reader.onload = (e) => {
-                pendingImageData = e.target.result;
-                previewThumb.src = pendingImageData;
-                previewThumb.style.display = 'block';
-                document.getElementById('imageUrl').value = '';
+            reader.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const scale = Math.min(1, maxW / img.width);
+                    canvas.width = Math.round(img.width * scale);
+                    canvas.height = Math.round(img.height * scale);
+                    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                    pendingImageData = canvas.toDataURL('image/jpeg', quality);
+                    const kb = Math.round(pendingImageData.length * 0.75 / 1024);
+                    previewThumb.src = pendingImageData;
+                    previewThumb.style.display = 'block';
+                    document.getElementById('imageUrl').value = '';
+                    if (kb > 800) {
+                        showToast(`Image is ${kb}KB — consider using a URL instead for faster loading.`, 'error');
+                    }
+                };
+                img.src = ev.target.result;
             };
             reader.readAsDataURL(file);
         }
@@ -976,7 +1000,12 @@
             };
 
             custom.push(newPhoto);
-            saveCustomPhotos(custom);
+            try {
+                saveCustomPhotos(custom);
+            } catch (err) {
+                // Storage quota exceeded - already shown toast in saveCustomPhotos
+                return;
+            }
 
             showToast(`"${title}" added to gallery!`);
 
